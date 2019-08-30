@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.jmrtd</groupId>
+  <artifactId>jmrtd</artifactId>
+  <version>0.7.13</version>
+
+  <name>JMRTD</name>
+  <description>Java Machine Readable Travel Documents API.</description>
+  <url>http://jmrtd.org</url>
+
+  <licenses>
+    <license>
+      <name>GNU Library or Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://sourceforge.net/projects/jmrtd/</url>
+    <connection>scm:svn:https://svn.code.sf.net/p/jmrtd/code</connection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>martijno</id>
+      <name>Martijn Oostdijk</name>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdk.version>1.6</jdk.version>
+    <java.version>${jdk.version}</java.version>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>net.sf.scuba</groupId>
+      <artifactId>scuba-smartcards</artifactId>
+      <version>0.0.18</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.62</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ejbca.cvc</groupId>
+      <artifactId>cert-cvc</artifactId>
+      <version>1.4.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>1.62</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.3</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+
+          <!-- Sources attachment -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Javadoc attachment -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.0.1</version>
+            <configuration>
+              <!-- additionalOptions>-html5</additionalOptions -->
+              <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
+              <links>
+                <link>https://bouncycastle.org/docs/docs1.5on</link>
+                <link>https://docs.oracle.com/javase/8/docs/api</link>
+                <link>https://static.javadoc.io/net.sf.scuba/scuba-smartcards/0.0.18</link>
+              </links>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- GPG Signed Components -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
+
