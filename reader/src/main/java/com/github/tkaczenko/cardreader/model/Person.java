@@ -1,12 +1,18 @@
+package com.github.tkaczenko.cardreader.model;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.jmrtd.lds.iso19794.FaceImageInfo;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Andrii Tkachenko
+ */
 @Getter
 @ToString
 @Builder
@@ -24,6 +30,7 @@ public class Person implements Serializable {
     private String docDateOExpiry;
     private Date docDateOfIssue;
     private String docIssuingAuthority;
+    private FaceImageInfo faceInfo;
 
     public static class PersonBuilder {
         public PersonBuilder names(String names) {
