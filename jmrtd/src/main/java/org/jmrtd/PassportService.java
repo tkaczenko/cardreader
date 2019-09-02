@@ -399,8 +399,8 @@ public class PassportService extends AbstractMRTDCardService {
    *
    * @throws CardServiceException on error
    */
-  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException {
-    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params);
+  public synchronized PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
+    PACEResult paceResult = (new PACEProtocol(paceSender, wrapper, maxTranceiveLength, shouldCheckMAC)).doPACE(keySpec, oid, params, parameterId);
     wrapper = paceResult.getWrapper();
     appletFileSystem.setWrapper(wrapper);
     return paceResult;

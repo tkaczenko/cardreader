@@ -173,9 +173,9 @@ public class PACEProtocol {
    *
    * @throws CardServiceException if authentication failed or on some lower-level error
    */
-  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params) throws CardServiceException {
+  public PACEResult doPACE(AccessKeySpec accessKey, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException {
     try {
-      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params);
+      return doPACE(accessKey, deriveStaticPACEKey(accessKey, oid), oid, params, parameterId);
     } catch (GeneralSecurityException gse) {
       throw new PACEException("PCD side error in key derivation step", gse);
     }
@@ -193,7 +193,7 @@ public class PACEProtocol {
    *
    * @throws CardServiceException if authentication failed or on lower level errors
    */
-  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters) throws CardServiceException {
+  private PACEResult doPACE(AccessKeySpec accessKey, SecretKey staticPACEKey, String oid, AlgorithmParameterSpec staticParameters, BigInteger parameterId) throws CardServiceException {
     MappingType mappingType = PACEInfo.toMappingType(oid); /* Either GM, CAM, or IM. */
     String agreementAlg = PACEInfo.toKeyAgreementAlgorithm(oid); /* Either DH or ECDH. */
     String cipherAlg  = PACEInfo.toCipherAlgorithm(oid); /* Either DESede or AES. */
@@ -212,7 +212,7 @@ public class PACEProtocol {
     try {
 
       /* FIXME: multiple domain params feature not implemented here, for now. */
-      byte[] referencePrivateKeyOrForComputingSessionKey = null;
+      byte[] referencePrivateKeyOrForComputingSessionKey = parameterId.toByteArray();
 
       /* Send to the PICC. */
       byte paceKeyReference = PassportService.MRZ_PACE_KEY_REFERENCE;

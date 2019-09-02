@@ -1,18 +1,20 @@
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
-import org.jmrtd.BACKey;
 import org.jmrtd.PACEKeySpec;
 import org.jmrtd.PassportService;
-import org.jmrtd.lds.*;
+import org.jmrtd.lds.CardAccessFile;
+import org.jmrtd.lds.LDSFileUtil;
+import org.jmrtd.lds.PACEInfo;
+import org.jmrtd.lds.SecurityInfo;
 import org.jmrtd.lds.icao.*;
 import org.jmrtd.lds.iso19794.FaceImageInfo;
 
+import javax.imageio.ImageIO;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Main {
+    private static SimpleDateFormat date = new SimpleDateFormat("dd.MM.yyyy");
+
     private static List<PACEInfo> getPACEInfos(Collection<SecurityInfo> securityInfos) {
         List<PACEInfo> paceInfos = new ArrayList<>();
         if (securityInfos == null) {
@@ -35,7 +39,7 @@ public class Main {
         return paceInfos;
     }
 
-    public static void main(String[] args) throws ParseException, GeneralSecurityException {
+    public static void main(String[] args) {
         try {
             CardTerminal terminal = TerminalFactory.getDefault().terminals().list().get(0);
             CardService cs = CardService.getInstance(terminal);
@@ -54,11 +58,8 @@ public class Main {
             if (paceInfos != null && paceInfos.size() > 0) {
                 PACEInfo paceInfo = paceInfos.get(0);
 
-                SimpleDateFormat date = new SimpleDateFormat("dd.MM.yyyy");
-                BACKey bacKey = new BACKey("001507691", date.parse("30.05.1988"), date.parse("06.02.2028"));
                 PACEKeySpec paceKey = PACEKeySpec.createCANKey("507691"); // the last 6 digits of the DocumentNo
-                PACEKeySpec mrzKey = PACEKeySpec.createMRZKey(bacKey);
-                ps.doPACE(mrzKey, paceInfo.getObjectIdentifier(), PACEInfo.toParameterSpec(paceInfo.getParameterId()));
+                ps.doPACE(paceKey, paceInfo.getObjectIdentifier(), PACEInfo.toParameterSpec(paceInfo.getParameterId()), paceInfo.getParameterId());
 
                 ps.sendSelectApplet(true);
 
@@ -70,7 +71,7 @@ public class Main {
             }
 
 
-            InputStream is1 = null;
+            InputStream is1;
             is1 = ps.getInputStream(PassportService.EF_DG1);
 
             // Basic data
@@ -97,24 +98,51 @@ public class Main {
                     .flatMap(faceInfo -> faceInfo.getFaceImageInfos().stream())
                     .collect(Collectors.toList());
 
+            saveFaceImage(faceInfos.get(0));
+
             MRZInfo mrzInfo = dg1.getMRZInfo();
-            Person person = Person.builder()
-                    .names(dg11.getNameOfHolder())
-                    .fathersName(dg11.getOtherNames())
-                    .dateOfBirth(new Date(dg11.getFullDateOfBirth()))
-                    .placeOfBirth(dg11.getPlaceOfBirth())
-                    .gender(mrzInfo.getGender().toString())
-                    .nationality(mrzInfo.getNationality())
-                    .docNumber(mrzInfo.getDocumentNumber())
-                    .docDateOExpiry(mrzInfo.getDateOfExpiry())
-                    .docIssuingAuthority(dg12.getIssuingAuthority())
-                    .docDateOfIssue(new Date(dg12.getDateOfIssue()))
-                    .build();
+            Person person = null;
+            try {
+                person = Person.builder()
+                        .names(dg11.getNameOfHolder())
+                        .fathersName(dg11.getOtherNames())
+                        .dateOfBirth(date.parse(dg11.getFullDateOfBirth()))
+                        .placeOfBirth(dg11.getPlaceOfBirth())
+                        .gender(mrzInfo.getGender().toString())
+                        .nationality(mrzInfo.getNationality())
+                        .docNumber(mrzInfo.getDocumentNumber())
+                        .docDateOExpiry(mrzInfo.getDateOfExpiry())
+                        .docIssuingAuthority(dg12.getIssuingAuthority())
+                        .docDateOfIssue(date.parse(dg12.getDateOfIssue()))
+                        .build();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             System.out.println(person);
             is1.close();
         } catch (CardException | CardServiceException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void saveFaceImage(FaceImageInfo imageInfo) throws IOException {
+        int imageLength = imageInfo.getImageLength();
+
+        DataInputStream dataInputStream = new DataInputStream(imageInfo.getImageInputStream());
+        byte[] buffer = new byte[imageLength];
+        dataInputStream.readFully(buffer, 0, imageLength);
+        FileOutputStream fileOut2 = new FileOutputStream("/home/tkacz/Desktop/" + "temp.jp2");
+        fileOut2.write(buffer);
+        fileOut2.flush();
+        fileOut2.close();
+        dataInputStream.close();
+
+        File tempFile = new File("/home/tkacz/Desktop/" + "temp.jp2");
+        BufferedImage nImage = ImageIO.read(tempFile);
+        if (tempFile.exists()) {
+            tempFile.delete();
+        }
+        ImageIO.write(nImage, "jpg", new File("/home/tkacz/Desktop/" + "facePhoto.jpg"));
     }
 }

@@ -96,7 +96,7 @@ public abstract class AbstractMRTDCardService extends FileSystemCardService {
    *
    * @throws CardServiceException if authentication failed or on error
    */
-  public abstract PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params) throws CardServiceException;
+  public abstract PACEResult doPACE(AccessKeySpec keySpec, String oid, AlgorithmParameterSpec params, BigInteger parameterId) throws CardServiceException;
 
   /**
    * Selects the card side applet. If PACE has been executed successfully previously, then the card has authenticated
