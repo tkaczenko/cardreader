@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>reader</name>
-    <description>E-Passport reader for Ukraine</description>
+    <description>ePassport reader for Ukraine</description>
 
     <artifactId>reader</artifactId>
     <version>0.1</version>
@@ -19,6 +19,22 @@
     <properties>
         <boot.version>2.1.6.RELEASE</boot.version>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
