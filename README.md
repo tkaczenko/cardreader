@@ -5,6 +5,13 @@ This project contains two modules:
 * [jmrtd](/jmrtd) - fork of [JMRTD](http://jmrtd.org/) to communicate with NFC reader by PACE protocol. Made some changes into sending APDU for PACE protocol with CAN (Card Access Number) key (added reference of a private key)
 * [reader](/reader) - CLI utility to read data from Ukrainian ID by PACE with CAN
 
+## Notice
+You don't need to use the fork of of [JMRTD](http://jmrtd.org/) from this repository from version `0.7.14`.
+These changes have been incorporated into `0.7.14` by Martijn Oostdijk.
+You can check it at [this discussion](https://sourceforge.net/p/jmrtd/discussion/580232/thread/ff434886d2/)
+
+Reading data from Ukrainian ePassport was checked with JMRTD v.0.7.14 and it works correctly.
+
 ## Usage
 ```bash
 java -jar reader-0.1.jar 000101
