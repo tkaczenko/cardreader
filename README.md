@@ -6,7 +6,7 @@ This project contains two modules:
 * [reader](/reader) - CLI utility to read data from Ukrainian ID by PACE with CAN
 
 ## Notice
-You don't need to use the fork of of [JMRTD](http://jmrtd.org/) from this repository from version `0.7.14`.
+You don't need to use the fork of of [JMRTD](http://jmrtd.org/) from this repository since version `0.7.14`.
 These changes have been incorporated into `0.7.14` by Martijn Oostdijk.
 You can check it at [this discussion](https://sourceforge.net/p/jmrtd/discussion/580232/thread/ff434886d2/)
 
