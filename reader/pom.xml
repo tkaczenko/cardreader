@@ -48,11 +48,6 @@
             <version>${boot.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jmrtd</groupId>
-            <artifactId>jmrtd</artifactId>
-            <version>0.7.13</version>
-        </dependency>
-        <dependency>
             <groupId>net.sf.scuba</groupId>
             <artifactId>scuba-smartcards</artifactId>
             <version>0.0.18</version>
